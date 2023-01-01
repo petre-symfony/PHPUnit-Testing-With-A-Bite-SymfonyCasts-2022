@@ -6,7 +6,7 @@ use App\Entity\Dinosaur;
 use PHPUnit\Framework\TestCase;
 
 class DinosaurTest extends TestCase {
-	public function testCanGetAndSetData(): void {
+	public function testDinosaur(): void {
 		$dino = new Dinosaur(
 			name: 'Big Eaty',
 			genus: 'Tyrannosaurus',
