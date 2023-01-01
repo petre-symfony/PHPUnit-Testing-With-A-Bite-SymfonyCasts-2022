@@ -7,6 +7,8 @@ use Symfony\Component\HttpClient\HttpClient;
 
 class GithubService {
 	public function getHealthReport(string $dinosaurName): HealthStatus{
+		$health = HealthStatus::HEALTHY;
+
 		$client = HttpClient::create();
 
 		$response = $client->request(
