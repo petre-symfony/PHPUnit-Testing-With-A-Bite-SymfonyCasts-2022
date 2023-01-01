@@ -43,6 +43,9 @@ class DinosaurTest extends TestCase {
 	}
 
 	public function testIsNotAcceptingVisitorsIfSeek(): void{
-		$this->markTestIncomplete();
+		$dino = new Dinosaur('Bumpy');
+		$dino->setHealth('sick');
+
+		self::assertFalse($dino->isAcceptingVisitors());
 	}
 }
