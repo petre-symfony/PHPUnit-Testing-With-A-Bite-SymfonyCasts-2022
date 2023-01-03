@@ -6,6 +6,7 @@ use App\Enum\HealthStatus;
 use PHPUnit\Framework\TestCase;
 use App\Service\GithubService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\HttpClient;
 
 class GithubServiceTest extends TestCase {
 	/**
@@ -13,8 +14,8 @@ class GithubServiceTest extends TestCase {
 	 */
 	public function testGetHealthReportReturnsCorrectHealthStatusForDino(HealthStatus $expectedStatus, string $dinoName): void{
 		$mockLogger = $this->createMock(LoggerInterface::class);
-		
-		$service = new GithubService($mockLogger);
+
+		$service = new GithubService(HttpClient::create(), $mockLogger);
 
 		self::assertSame($expectedStatus, $service->getHealthReport($dinoName));
 	}
