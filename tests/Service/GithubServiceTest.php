@@ -33,7 +33,7 @@ class GithubServiceTest extends TestCase {
 			]);
 
 		$mockHttpClient
-			->expects(self::never())
+			->expects(self::once())
 			->method('request')
 			->with('GET', 'https://api.github.com/repos/SymfonyCasts/dino-park/issues')
 			->willReturn($mockResponse);
