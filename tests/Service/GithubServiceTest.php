@@ -78,7 +78,8 @@ class GithubServiceTest extends TestCase {
 		$service = new GithubService($mockHttpClient, $mockLogger);
 
 		$this->expectException(\RuntimeException::class);
-		
+		$this->expectExceptionMessage('Drowsy is an unknown status label');
+
 		$service->getHealthReport('Maverick');
 	}
 }
