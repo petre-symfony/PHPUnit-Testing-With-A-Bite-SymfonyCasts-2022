@@ -36,7 +36,7 @@ class GithubService {
 	}
 
 	private function getDinoStatusFomLabels(array $labels): HealthStatus{
-		$status = null;
+		$health = HealthStatus::HEALTHY;
 
 		foreach ($labels as $label){
 			$label = $label['name'];
