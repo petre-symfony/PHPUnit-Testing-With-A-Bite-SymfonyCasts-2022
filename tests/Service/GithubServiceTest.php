@@ -13,6 +13,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class GithubServiceTest extends TestCase {
+	private LoggerInterface $mockLogger;
+	private MockHttpClient $mockHttpClient;
+	private MockResponse $mockResponse;
 	/**
 	 * @dataProvider dinoNameProvider
 	 */
@@ -73,5 +76,13 @@ class GithubServiceTest extends TestCase {
 		$this->expectExceptionMessage('Drowsy is an unknown status label');
 
 		$service->getHealthReport('Maverick');
+	}
+
+	public function createGithubService(array $responseData): GithubService {
+		$this->mockResponse = new MockResponse(json_encode($responseData));
+
+		$this->mockHttpClient->setResponseFactory($this->mockResponse);
+
+		return new GithubService($this->mockHttpClient, $this->mockLogger);
 	}
 }
