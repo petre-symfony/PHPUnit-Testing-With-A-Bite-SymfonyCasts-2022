@@ -6,11 +6,8 @@ use App\Enum\HealthStatus;
 use PHPUnit\Framework\TestCase;
 use App\Service\GithubService;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class GithubServiceTest extends TestCase {
 	private LoggerInterface $mockLogger;
@@ -26,32 +23,24 @@ class GithubServiceTest extends TestCase {
 	 * @dataProvider dinoNameProvider
 	 */
 	public function testGetHealthReportReturnsCorrectHealthStatusForDino(HealthStatus $expectedStatus, string $dinoName): void{
-		$mockLogger = $this->createMock(LoggerInterface::class);
-		$mockHttpClient = $this->createMock(HttpClientInterface::class);
-		$mockResponse = $this->createMock(ResponseInterface::class);
-
-		$mockResponse
-			->method('toArray')
-			->willReturn([
-				[
-					'title' => 'Daisy',
-					'labels' => [['name' => 'Status: Sick']]
-				],
-				[
-					'title' => 'Maverick',
-					'labels' => [['name' => 'Status: Healthy']]
-				]
-			]);
-
-		$mockHttpClient
-			->expects(self::once())
-			->method('request')
-			->with('GET', 'https://api.github.com/repos/SymfonyCasts/dino-park/issues')
-			->willReturn($mockResponse);
-
-		$service = new GithubService($mockHttpClient, $mockLogger);
+		$service = $this->createGithubService([
+			[
+				'title' => 'Daisy',
+				'labels' => [['name' => 'Status: Sick']]
+			],
+			[
+				'title' => 'Maverick',
+				'labels' => [['name' => 'Status: Healthy']]
+			]
+		]);
 
 		self::assertSame($expectedStatus, $service->getHealthReport($dinoName));
+		self::assertSame(1, $this->mockHttpClient->getRequestsCount());
+		self::assertSame('GET', $this->mockResponse->getRequestMethod());
+		self::assertSame(
+			'https://api.github.com/repos/SymfonyCasts/dino-park/issues',
+			$this->mockResponse->getRequestUrl()
+		);
 	}
 
 	public function dinoNameProvider(): \Generator {
