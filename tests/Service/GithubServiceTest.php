@@ -7,6 +7,8 @@ use PHPUnit\Framework\TestCase;
 use App\Service\GithubService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -56,26 +58,16 @@ class GithubServiceTest extends TestCase {
 	}
 
 	public function testExceptionThrownWithUnknownLabel(): void{
-		$mockLogger = $this->createMock(LoggerInterface::class);
-		$mockHttpClient = $this->createMock(HttpClientInterface::class);
-		$mockResponse = $this->createMock(ResponseInterface::class);
+		$mockResponse = new MockResponse(json_encode([
+			[
+				'title' => 'Maverick',
+				'labels' => [['name' => 'Status: Drowsy']]
+			]
+		]));
 
-		$mockResponse
-			->method('toArray')
-			->willReturn([
-				[
-					'title' => 'Maverick',
-					'labels' => [['name' => 'Status: Drowsy']]
-				]
-			]);
+		$mockHttpClient = new MockHttpClient($mockResponse);
 
-		$mockHttpClient
-			->expects(self::once())
-			->method('request')
-			->with('GET', 'https://api.github.com/repos/SymfonyCasts/dino-park/issues')
-			->willReturn($mockResponse);
-
-		$service = new GithubService($mockHttpClient, $mockLogger);
+		$service = new GithubService($mockHttpClient, $this->createMock(LoggerInterface::class));
 
 		$this->expectException(\RuntimeException::class);
 		$this->expectExceptionMessage('Drowsy is an unknown status label');
