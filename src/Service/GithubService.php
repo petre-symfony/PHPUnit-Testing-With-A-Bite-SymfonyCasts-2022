@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Enum\HealthStatus;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use function PHPUnit\Framework\throwException;
 
 class GithubService {
 	public function __construct(
@@ -47,8 +48,14 @@ class GithubService {
 
 			// Remove the "Status:" and whitespace from the label
 			$status = trim(substr($label, strlen('Status:')));
+
+			$health = HealthStatus::tryFrom($status);
+
+			if(null === $health) {
+				throw new \RuntimeException(sprintf('%s is an unknown status label', $status));
+			}
 		}
 
-		return HealthStatus::tryFrom($status);
+		return $health;
 	}
 }
